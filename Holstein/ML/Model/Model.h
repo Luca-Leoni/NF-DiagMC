@@ -1,8 +1,8 @@
 #pragma once
 
-#include <LLNF/Archetypes/distribution.h>
-#include <LLNF/Archetypes/flow.h>
-#include <LLNF/Nets/MLP.h>
+#include <NF/Archetypes/distribution.h>
+#include <NF/Archetypes/flow.h>
+#include <NF/Nets/MLP.h>
 
 #include "Option.h"
 
@@ -14,18 +14,16 @@ class BaseImpl : public Distribution {
 public:
   BaseImpl(int max_order, torch::TensorOptions options = torch::kF64);
 
-  std::tuple<torch::Tensor, torch::Tensor> forward(int num_sample = 1) override; 
+  std::tuple<torch::Tensor, torch::Tensor> forward(int num_sample = 1) override;
   torch::Tensor sample(uint num_sample = 1) override;
   torch::Tensor log_prob(const torch::Tensor &z) override;
   torch::Tensor cond_sample(const torch::Tensor &cond) override;
 
 private:
   torch::Tensor mean;
-
 };
 
 TORCH_MODULE(Base);
-
 
 class TargetImpl : public TargetDistribution {
 public:
@@ -35,15 +33,15 @@ public:
 
 private:
   double c;
-
 };
 
 TORCH_MODULE(Target);
 
-//---MODEL---// 
+//---MODEL---//
 
 std::vector<std::shared_ptr<Flow>> create_flow_list(Option opt);
-void print_vector(const std::vector<double> &vx, const char * path, bool over = false);
-std::vector<double> read_vector(const char * path);
+void print_vector(const std::vector<double> &vx, const char *path,
+                  bool over = false);
+std::vector<double> read_vector(const char *path);
 
-}
+} // namespace MLHol

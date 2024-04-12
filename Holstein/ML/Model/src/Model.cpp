@@ -2,12 +2,12 @@
 #include <ATen/TensorIndexing.h>
 #include <ATen/ops/ones.h>
 #include <ATen/ops/zeros.h>
+#include <NF/Flows/Std.h>
 #include <c10/core/DeviceType.h>
 #include <c10/core/ScalarType.h>
 #include <cstdio>
 #include <math.h>
 #include <torch/nn/functional/activation.h>
-#include <LLNF/Flows/Std.h>
 
 using namespace torch;
 using namespace MLHol;
@@ -15,53 +15,55 @@ using namespace MLHol;
 #define F torch::nn::functional
 
 /*******
- *  The vectors here will be represented as 
+ *  The vectors here will be represented as
  *
  *  [tau, tau_1, tau_2, ...]
  * */
 
-BaseImpl::BaseImpl(int max_order, torch::TensorOptions options): Distribution(max_order){
+BaseImpl::BaseImpl(int max_order, torch::TensorOptions options)
+    : Distribution(max_order) {
   mean = register_buffer("mean", torch::full({max_order + 1}, 10, options));
 }
 
-std::tuple<torch::Tensor, torch::Tensor> BaseImpl::forward(int num_sample){
-  auto tau     = torch::linspace(0.05, 20, num_sample / 10, mean.options()).repeat(10).unsqueeze(-1);
+std::tuple<torch::Tensor, torch::Tensor> BaseImpl::forward(int num_sample) {
+  auto tau = torch::linspace(0.05, 20, num_sample / 10, mean.options())
+                 .repeat(10)
+                 .unsqueeze(-1);
   // auto tau     = 10 * torch::ones({num_sample, 1}, mean.options());
   auto samples = torch::randn({num_sample, get_dim()}, mean.options()) + 2.;
 
   auto res = torch::cat({tau, samples}, 1);
-  auto log_prob = -get_dim() * 0.9189385332046727 - (0.5 * (samples - 2.).pow(2)).sum(1);
+  auto log_prob =
+      -get_dim() * 0.9189385332046727 - (0.5 * (samples - 2.).pow(2)).sum(1);
 
   return {res, log_prob};
 }
 
 Tensor BaseImpl::sample(uint num_sample) {
-  auto tau     = 20. * torch::rand({num_sample, 1}, mean.options());
+  auto tau = 20. * torch::rand({num_sample, 1}, mean.options());
   // auto tau     = 10 * torch::ones({num_sample, 1}, mean.options());
   auto samples = torch::randn({num_sample, get_dim()}, mean.options()) + 2.;
 
   return torch::cat({tau, samples}, 1);
 }
 
-
-Tensor BaseImpl::log_prob(const Tensor &z) { 
+Tensor BaseImpl::log_prob(const Tensor &z) {
   auto tau = z.slice(1, 0, 1);
-  return -get_dim() * 0.9189385332046727 - (0.5 * (z.slice(1,1)  - 2.).pow(2)).sum(1);
+  return -get_dim() * 0.9189385332046727 -
+         (0.5 * (z.slice(1, 1) - 2.).pow(2)).sum(1);
 }
 
-
-Tensor BaseImpl::cond_sample(const Tensor &cond){
+Tensor BaseImpl::cond_sample(const Tensor &cond) {
   auto samples = torch::randn({cond.size(0), get_dim()}, cond.options()) + 2.;
 
   return torch::cat({cond, samples}, 1);
 }
 
+TargetImpl::TargetImpl(int max_order, double c)
+    : TargetDistribution(max_order, torch::kF64), c(c) {}
 
-TargetImpl::TargetImpl(int max_order, double c): TargetDistribution(max_order, torch::kF64), c(c) {}
-
-
-Tensor TargetImpl::log_prob(const torch::Tensor &z){
-  auto t  = z.slice(1, 0, 1);
+Tensor TargetImpl::log_prob(const torch::Tensor &z) {
+  auto t = z.slice(1, 0, 1);
   auto ti = z.slice(1, 1);
   auto res = torch::zeros_like(ti);
 
@@ -79,28 +81,30 @@ Tensor TargetImpl::log_prob(const torch::Tensor &z){
   return res.sum(1);
 }
 
-
-std::vector<std::shared_ptr<Flow>> MLHol::create_flow_list(Option opt){
+std::vector<std::shared_ptr<Flow>> MLHol::create_flow_list(Option opt) {
   std::vector<std::shared_ptr<Flow>> flows;
 
-  for (int j = 0; j != opt.NAffine; j++){
-    flows.push_back(std::shared_ptr<Flow>(new ARQSImpl(opt.MOrder, opt.n_bin, opt.bound, opt.Hidden, 1)));
-    // flows.push_back(std::shared_ptr<Flow>(new AAffImpl(opt.MOrder, opt.Hidden, 1)));
+  for (int j = 0; j != opt.NAffine; j++) {
+    flows.push_back(std::shared_ptr<Flow>(
+        new ARQSImpl(opt.MOrder, opt.n_bin, opt.bound, opt.Hidden, 1)));
+    // flows.push_back(std::shared_ptr<Flow>(new AAffImpl(opt.MOrder,
+    // opt.Hidden, 1)));
   }
 
   return flows;
 }
 
-void MLHol::print_vector(const std::vector<double> &vx, const char * path, bool over){
-  FILE *file; 
+void MLHol::print_vector(const std::vector<double> &vx, const char *path,
+                         bool over) {
+  FILE *file;
 
-  if (over){
+  if (over) {
     file = fopen(path, "a");
-  } else{
+  } else {
     file = fopen(path, "w");
   }
 
-  if (file == NULL){
+  if (file == NULL) {
     printf("Unable to open file!\n");
     exit(1);
   }
@@ -111,10 +115,10 @@ void MLHol::print_vector(const std::vector<double> &vx, const char * path, bool 
   fclose(file);
 }
 
-std::vector<double> MLHol::read_vector(const char * path){
-  FILE *file = fopen(path, "r"); 
+std::vector<double> MLHol::read_vector(const char *path) {
+  FILE *file = fopen(path, "r");
 
-  if (file == NULL){
+  if (file == NULL) {
     printf("Unable to open file!\n");
     exit(1);
   }
@@ -122,12 +126,12 @@ std::vector<double> MLHol::read_vector(const char * path){
   std::vector<double> vx;
   double temp;
 
-  while(fscanf(file, "%lf", &temp) == 1)
+  while (fscanf(file, "%lf", &temp) == 1)
     vx.push_back(temp);
 
   if (feof(file))
     printf("Vector readed correctly!\n");
-  else{
+  else {
     printf("Problem reading the vector!\n");
     exit(1);
   }
