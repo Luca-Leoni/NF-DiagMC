@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -Wall -Wextra -shared -Wl,-soname,libDMC.so -o libDMC.so CMakeFiles/DMC.dir/Axis.cpp.o CMakeFiles/DMC.dir/Histogram.cpp.o CMakeFiles/DMC.dir/LinearFunApprox.cpp.o CMakeFiles/DMC.dir/NewtonFunApprox.cpp.o CMakeFiles/DMC.dir/CDFInverse.cpp.o CMakeFiles/DMC.dir/SimOptions.cpp.o CMakeFiles/DMC.dir/Bijection.cpp.o 
