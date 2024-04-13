@@ -1,7 +1,7 @@
 add_library(MLHol SHARED
   Model/src/Option.cpp
   Model/src/Model.cpp)
-target_link_libraries(MLHol PUBLIC "${TORCH_LIBRARIES}" LLNF)
+target_link_libraries(MLHol PUBLIC "${TORCH_LIBRARIES}" NF)
 target_include_directories(MLHol PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Model/)
 set_property(TARGET MLHol PROPERTY CXX_STANDARD 17)
 

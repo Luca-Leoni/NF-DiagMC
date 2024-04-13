@@ -60,8 +60,6 @@ int main(int argc, char *argv[]) {
 
     printf("End of epoch %3d the loss is: %.4f\n", i, *(loss_hist.end() - 1));
     torch::save(flow, (std::string(argv[1]) + "Mod.pt").data());
-    // print_vector(loss_hist, (std::string(argv[1]) + "loss.dat").data(),
-    // opt.ResTrain);
   }
 
   std::cout << "\nEnded training saving the model!" << std::endl;

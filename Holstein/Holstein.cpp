@@ -7,7 +7,7 @@
 #include <future>
 #include <mutex>
 
-using namespace LLDMC;
+using namespace DMC;
 using namespace Holstein;
 
 std::mutex lock;
@@ -37,9 +37,9 @@ void lsimulation(SimOptions opt) {
 
   lock.lock();
   if (standard)
-    manager.print("./Results/Local/");
+    manager.print("./Holstein/Results/Local/");
   else
-    manager.print("./Results/Local/" + to_string(opt("g")) + "/");
+    manager.print("./Holstein/Results/Local/" + to_string(opt("g")) + "/");
   lock.unlock();
 }
 
@@ -62,14 +62,14 @@ void nsimulation(SimOptions opt) {
 
   lock.lock();
   if (standard)
-    manager.print("./Results/Neural/");
+    manager.print("./Holstein/Results/Neural/");
   else
-    manager.print("./Results/Neural/" + to_string(opt("g")) + "/");
+    manager.print("./Holstein/Results/Neural/" + to_string(opt("g")) + "/");
   lock.unlock();
 }
 
 void prepare_file(double g = -1) {
-  std::string path = "./Results/";
+  std::string path = "./Holstein/Results/";
   std::vector<std::string> updates = {"Local", "Neural"};
   std::vector<std::string> observa = {"Eg", "Green"};
 
@@ -126,19 +126,12 @@ void main_simulation(SimOptions opt, int nThread, double g = -1) {
 
 int main(int argc, char *argv[]) {
   // Read options
-  SimOptions opt("/home/lion/Scrivania/Tesi_Magistrale/Code/C++/LLDMC/apps/"
-                 "Holstein/sim.ini");
+  SimOptions opt("./Holstein/sim.ini");
 
   // Do simulations
   if (argc <= 1) {
     printf("Error: needed number of thread!\n");
     return 1;
-  }
-
-  // For debug
-  if (std::stoi(argv[1]) == 1) {
-    nsimulation(opt);
-    return 0;
   }
 
   // Reading inputs

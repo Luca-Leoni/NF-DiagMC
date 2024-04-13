@@ -1,5 +1,0 @@
-/home/utente/CODE/NF-DiagMC/build/CMakeFiles/edit_cache.dir
-/home/utente/CODE/NF-DiagMC/build/CMakeFiles/rebuild_cache.dir
-/home/utente/CODE/NF-DiagMC/build/src/CMakeFiles/DMC.dir
-/home/utente/CODE/NF-DiagMC/build/src/CMakeFiles/edit_cache.dir
-/home/utente/CODE/NF-DiagMC/build/src/CMakeFiles/rebuild_cache.dir

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <DMC/Archetypes.h>
-#include <LLNF/fmanager.h>
 #include <Model.h>
+#include <NF/fmanager.h>
 #include <Option.h>
 #include <array>
 #include <torch/torch.h>
@@ -12,12 +12,13 @@ namespace Holstein {
 class Diagram : public DMC::Configuration {
 public:
   Diagram() : Configuration("Holstein") {
-    MLHol::Option opt = MLHol::Option::read("./ML/Results/RQS/2_5_20/sim.ini");
+    MLHol::Option opt =
+        MLHol::Option::read("./Holstein/ML/Results/RQS/2_5_20/sim.ini");
     auto base = MLHol::Base(opt.MOrder, torch::kF64);
     auto targ = MLHol::Target(opt.MOrder, opt.CPlateu);
 
     NNsample = LLNF::FlowManager(base, MLHol::create_flow_list(opt), targ);
-    torch::load(NNsample, "./ML/Results/RQS/2_5_20/Mod.pt");
+    torch::load(NNsample, "./Holstein/ML/Results/RQS/2_5_20/Mod.pt");
     NNsample->eval();
     NNsample->to(torch::kCPU);
   }
